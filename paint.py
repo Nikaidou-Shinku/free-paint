@@ -66,8 +66,6 @@ def finish(px):
     print(colorama.Fore.GREEN + "[Info] Position (%d, %d) is ok." % px)
 
 def px_change(x, y, c):
-    global tasks
-
     px = (x, y)
     if px not in tasks:
         return
@@ -81,7 +79,6 @@ def px_change(x, y, c):
         finish(px)
 
 async def get_board(client):
-    global tasks
     global finish_num
     global change_time
 
@@ -101,8 +98,6 @@ async def get_board(client):
             change_time[px] = 0
 
 async def refresh_board(client):
-    global tasks
-
     url = PAINTBOARD_URL + "/board"
     async with client.get(url) as res:
         board = await res.text()
@@ -113,9 +108,6 @@ async def refresh_board(client):
         px_change(x, y, nowc)
 
 async def get_pxs(client):
-    global finish_num
-    global total_num
-
     while True:
         await asyncio.sleep(5)
         await refresh_board(client)
@@ -138,8 +130,6 @@ async def getToken():
     return TOKEN_LIST[token_idx - 1]
 
 async def paint_px(client, data, token):
-    global change_time
-
     url = PAINTBOARD_URL + "/paint?token=" + token
     async with client.post(url, data = data) as res:
         if res.status == 200:
@@ -153,15 +143,12 @@ async def paint_px(client, data, token):
                 print(colorama.Fore.RED + "[Error] Cooling time is not up.")
             else:
                 print(colorama.Fore.RED + "[Error] 403:")
-                print(colorama.Fore.RED + msg)
+                print(colorama.Fore.RED + str(msg))
         else:
             print(colorama.Fore.RED + "[Error] %d:" % (res.status))
             print(colorama.Fore.RED + await res.text())
 
 async def paint_pxs(client):
-    global tasks
-    global change_time
-
     await asyncio.sleep(1)
     while True:
         token = await getToken()
