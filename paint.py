@@ -9,8 +9,8 @@ import colorama
 if platform.system() == "Linux":
     import uvloop
 
-FROM_X = 160
-FROM_Y = 400
+FROM_X = 210
+FROM_Y = 441
 
 SLEEP_TIME = 31
 PAINTBOARD_URL = "https://www.luogu.com.cn/paintboard"
@@ -102,6 +102,9 @@ async def refresh_board(client):
     async with client.get(url) as res:
         board = await res.text()
     board = board.split()
+    if len(board) != 1000:
+        print(colorama.Fore.RED + "[Error] Get paintboard failed.")
+        return
     for px in tasks:
         x, y = px
         nowc = alpha2number(board[x][y])
