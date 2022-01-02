@@ -99,8 +99,7 @@ async def getToken():
     token_idx += 1
     return TOKEN_LIST[token_idx - 1]
 
-async def paint_px(client, data):
-    token = await getToken()
+async def paint_px(client, data, token):
     url = PAINTBOARD_URL + "/paint?token=" + token
     async with client.post(url, data = data) as res:
         if res.status == 200:
@@ -122,11 +121,12 @@ async def paint_px(client, data):
 async def paint_pxs(client):
     await asyncio.sleep(1)
     while True:
+        token = await getToken()
         px = change_time.most_common(1)[0]
         x, y = px[0]
         print(colorama.Fore.YELLOW + "[Info] get px (%d, %d) with change time %d." % (x, y, px[1]))
         c, nowc = tasks[px[0]]
-        await paint_px(client, {"x": x, "y": y, "color": c})
+        await paint_px(client, {"x": x, "y": y, "color": c}, token)
 
 async def print_infos():
     while True:
