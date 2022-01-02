@@ -49,7 +49,7 @@ async def get_board(client):
     url = PAINTBOARD_URL + "/board"
     async with client.get(url) as res:
         board = await res.text()
-    board = board.split()
+    board = board.split('\n')
     for px in tasks:
         x, y = px
         c, nowc = tasks[px]
@@ -68,21 +68,21 @@ async def get_pxs(client):
         async for msg in ws:
             res = json.loads(msg.data)
             if res["type"] == "paintboard_update":
-                x, y = res["x"], res["y"]
-                if (x, y) in tasks:
-                    c, nowc = tasks[(x, y)]
+                px = (res["x"], res["y"])
+                if px in tasks:
+                    c, nowc = tasks[px]
                     mark1 = c == nowc
                     nowc = res["color"]
                     mark2 = c == nowc
-                    tasks[(x, y)] = (c, nowc)
+                    tasks[px] = (c, nowc)
                     if mark1 and (not mark2):
                         finish_num -= 1
-                        change_time[(x, y)] += VERY_BIG_NUMBER + 1
-                        print(colorama.Fore.RED + "[Warn] Position (%d, %d) is damaged with time %d." % (x, y, change_time[(x, y)]))
+                        change_time[px] += VERY_BIG_NUMBER + 1
+                        print(colorama.Fore.RED + "[Warn] Position (%d, %d) is damaged with time %d." % (px + (change_time[px],)))
                     if (not mark1) and mark2:
                         finish_num += 1
-                        change_time[(x, y)] -= VERY_BIG_NUMBER
-                        print(colorama.Fore.GREEN + "[Info] Position (%d, %d) is ok." % (x, y))
+                        change_time[px] -= VERY_BIG_NUMBER
+                        print(colorama.Fore.GREEN + "[Info] Position (%d, %d) is ok." % px)
 
 token_idx = 0
 head_time = 0
@@ -103,7 +103,9 @@ async def paint_px(client, data, token):
     url = PAINTBOARD_URL + "/paint?token=" + token
     async with client.post(url, data = data) as res:
         if res.status == 200:
-            print(colorama.Fore.BLUE + "[Info] Paint successed at position (%d, %d)." % (data["x"], data["y"]))
+            x, y = data["x"], data["y"]
+            change_time[(x, y)] -= 1
+            print(colorama.Fore.BLUE + "[Info] Paint successed at position (%d, %d)." % (x, y))
         elif res.status == 403:
             msg = await res.text()
             msg = json.loads(msg)

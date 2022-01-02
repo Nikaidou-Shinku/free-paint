@@ -7,6 +7,7 @@ LUOGU_PAINTBOARD_COLORS = [
     (170, 170, 170),
     (85, 85, 85),
     (254, 211, 199),
+    (255, 196, 206),
     (250, 172, 142),
     (255, 139, 131),
     (244, 67, 54),
@@ -32,8 +33,7 @@ LUOGU_PAINTBOARD_COLORS = [
     (255, 152, 0),
     (255, 87, 34),
     (184, 63, 39),
-    (121, 85, 72),
-    (255, 196, 206)
+    (121, 85, 72)
 ]
 
 PALETTE = [item for color in LUOGU_PAINTBOARD_COLORS for item in color]
