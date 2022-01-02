@@ -9,6 +9,9 @@ import colorama
 if platform.system() == "Linux":
     import uvloop
 
+FROM_X = 160
+FROM_Y = 400
+
 SLEEP_TIME = 31
 PAINTBOARD_URL = "https://www.luogu.com.cn/paintboard"
 WEBSOCKET_URL = "wss://ws.luogu.com.cn/ws"
@@ -141,9 +144,6 @@ async def paint_px(client, data, token):
     async with client.post(url, data = data) as res:
         if res.status == 200:
             px_change(data["x"], data["y"], data["color"])
-            # x, y = data["x"], data["y"]
-            # change_time[(x, y)] -= 1
-            # print(colorama.Fore.BLUE + "[Info] Paint successed at position (%d, %d)." % (x, y))
         elif res.status == 403:
             msg = await res.text()
             msg = json.loads(msg)
@@ -173,7 +173,7 @@ async def paint_pxs(client):
 
 async def main():
     load_tokens("tokens.txt")
-    load_picture("picture.json", 160, 400)
+    load_picture("picture.json", FROM_X, FROM_Y)
     async with aiohttp.ClientSession() as client:
         await get_board(client)
 

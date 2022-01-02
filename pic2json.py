@@ -60,7 +60,7 @@ def handle(fileName: str):
     pxlist = findAvailablePixels(pic)
     pic = pic.convert("RGB").quantize(palette = getPalette())
     pxlist = attachColor(pic, pxlist)
-    with open("output.json", "w", encoding = "UTF-8") as result:
+    with open("picture.json", "w", encoding = "UTF-8") as result:
         result.write(json.dumps(pxlist, separators = (',', ':')))
     pic.save("preview.png")
 
