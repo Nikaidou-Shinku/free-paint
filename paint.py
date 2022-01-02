@@ -4,6 +4,7 @@ import time
 import asyncio
 import aiohttp
 import collections
+import colorama
 
 if platform.system() == "Linux":
     import uvloop
@@ -77,11 +78,11 @@ async def get_pxs(client):
                     if mark1 and (not mark2):
                         finish_num -= 1
                         change_time[(x, y)] += VERY_BIG_NUMBER + 1
-                        print("[Info] Position (%d, %d) is damaged with time %d." % (x, y, change_time[(x, y)]))
+                        print(colorama.Fore.RED + "[Warn] Position (%d, %d) is damaged with time %d." % (x, y, change_time[(x, y)]))
                     if (not mark1) and mark2:
                         finish_num += 1
                         change_time[(x, y)] -= VERY_BIG_NUMBER
-                        print("[Info] Position (%d, %d) is ok." % (x, y))
+                        print(colorama.Fore.GREEN + "[Info] Position (%d, %d) is ok." % (x, y))
 
 token_idx = 0
 head_time = 0
@@ -103,27 +104,27 @@ async def paint_px(client, data):
     url = PAINTBOARD_URL + "/paint?token=" + token
     async with client.post(url, data = data) as res:
         if res.status == 200:
-            print("[Info] Paint successed at position (%d, %d)." % (data["x"], data["y"]))
+            print(colorama.Fore.BLUE + "[Info] Paint successed at position (%d, %d)." % (data["x"], data["y"]))
         elif res.status == 403:
             msg = await res.text()
             msg = json.loads(msg)
             if msg["data"] == "Invalid token":
-                print("[Error] Token does not work.")
+                print(colorama.Fore.RED + "[Error] Token does not work.")
             elif msg["data"] == "操作过于频繁":
-                print("[Error] Cooling time is not up.")
+                print(colorama.Fore.RED + "[Error] Cooling time is not up.")
             else:
-                print("[Error] 403:")
-                print(msg)
+                print(colorama.Fore.RED + "[Error] 403:")
+                print(colorama.Fore.RED + msg)
         else:
-            print("[Error] %d:" % (res.status))
-            print(await res.text())
+            print(colorama.Fore.RED + "[Error] %d:" % (res.status))
+            print(colorama.Fore.RED + await res.text())
 
 async def paint_pxs(client):
     await asyncio.sleep(1)
     while True:
         px = change_time.most_common(1)[0]
         x, y = px[0]
-        print("[Info] get px (%d, %d) with change time %d." % (x, y, px[1]))
+        print(colorama.Fore.YELLOW + "[Info] get px (%d, %d) with change time %d." % (x, y, px[1]))
         c, nowc = tasks[px[0]]
         await paint_px(client, {"x": x, "y": y, "color": c})
 
@@ -134,7 +135,7 @@ async def print_infos():
 
 async def main():
     load_tokens("tokens.txt")
-    load_picture("picture.json", 556, 459)
+    load_picture("picture.json", 158, 400)
     async with aiohttp.ClientSession() as client:
         await get_board(client)
 
@@ -147,6 +148,7 @@ async def main():
         await task_print_infos
 
 if __name__ == "__main__":
+    colorama.init(autoreset = True)
     if platform.system() == "Linux":
         uvloop.install()
         asyncio.run(main())
