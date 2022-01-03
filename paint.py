@@ -8,13 +8,14 @@ import colorama
 if platform.system() == "Linux":
     import uvloop
 
+
 FROM_X = 160
 FROM_Y = 391
-CONCURRENCY = 6
+CONCURRENCY = 350
 
-TIMEOUT_TIME = 1
 SLEEP_TIME = 31
 RETRY_TIME = 5
+TIMEOUT_TIME = 1
 PAINTBOARD_URL = "https://www.luogu.com.cn/paintboard"
 WEBSOCKET_URL = "wss://ws.luogu.com.cn/ws"
 JOIN_PAINTBOARD = {
@@ -22,14 +23,15 @@ JOIN_PAINTBOARD = {
     "channel": "paintboard",
     "channel_param": ""
 }
+
+
 VERY_BIG_NUMBER = 998244353
 CHANGE_TIME_LOCK = asyncio.Lock()
-
+TOKEN_NUM = 0
 tasks = {}
 change_time = collections.Counter()
 total_num = 0
 finish_num = 0
-TOKEN_NUM = 0
 
 
 def moveCurse(line, row):
@@ -164,7 +166,7 @@ async def paint_px(client, data, idx, token):
                 tasks[px] = (target, data["color"])
                 finish_num += 1
                 print_token_info(idx, token, colorama.Fore.GREEN,
-                    "[info] Paint successed at position (%d, %d)." % px)
+                    "[Info] Paint successed at position (%d, %d)." % px)
                 print_board_info()
                 return SLEEP_TIME
             elif res.status == 403:
@@ -194,11 +196,13 @@ async def paint_px(client, data, idx, token):
             "[Error] Timeout.")
         return 0.1
 
+
 def print_token_info(idx, token, color, msg):
     moveCurse(idx + 1, 1)
     print("\033[2K", end = "")
     msg = color + "[{}]: {}".format(token, msg)
     print(msg)
+
 
 async def paint_pxs(sem, idx, token, client):
     while True:
@@ -210,7 +214,7 @@ async def paint_pxs(sem, idx, token, client):
             else:
                 paint_mark = False
                 print_token_info(idx, token, colorama.Fore.BLUE,
-                    "[info] No pixel need to paint.")
+                    "[Info] No pixel need to paint.")
                 # Reliability has yet to be tested
         if paint_mark:
             x, y = px[0]
